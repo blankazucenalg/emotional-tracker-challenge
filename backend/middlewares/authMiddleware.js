@@ -14,10 +14,10 @@ const protect = async (req, res, next) => {
     try {
       token = req.headers.authorization.split(' ')[1];
       const decoded = jwt.verify(token, JWT_SECRET);
-      
+
       // Inefficient query - not using projection
-      req.user = await User.findById(decoded.id);
-      
+      req.user = await User.findById(decoded.id, { role: 1 });
+
       next();
     } catch (error) {
       res.status(401).json({ message: 'Not authorized, token failed' });
@@ -38,4 +38,4 @@ const isAdmin = (req, res, next) => {
   }
 };
 
-module.exports = { protect };
+module.exports = { protect, isAdmin };

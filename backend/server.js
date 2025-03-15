@@ -1,14 +1,34 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const session = require('express-session');
+const helmet = require("helmet");
 const userRoutes = require('./routes/userRoutes');
 const emotionRoutes = require('./routes/emotionRoutes');
+const cookieParser = require('cookie-parser');
 
 const app = express();
 
 // Middleware
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: '10mb' }));
+app.use(helmet());
+app.use(cookieParser());
+app.use(express.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
+app.use(useragent.express()); // for getting client device info
+
+app.set('trust proxy', 1)
+app.use(session({
+  secret: 'your-secret-key',
+  name: 'cookieName',
+  cookie: { secure: true, httpOnly: true, path: '/user', sameSite: true }
+}));
+
+const health = {
+  version: process.env.npm_package_version || config.version || 'dev',
+  service: `${config.name}-service`,
+};
+app.get('/health', (req, res) => res.json(health));
 
 // Database connection
 // TODO: Move this to a separate config file
@@ -37,5 +57,5 @@ app.use((req, res) => {
 // Error handling middleware
 // TODO: Implement proper error handling middleware
 
-const PORT = process.env.PORT ||5050;
+const PORT = process.env.PORT || 5050;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

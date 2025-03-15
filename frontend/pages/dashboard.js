@@ -1,6 +1,7 @@
-import { useContext, useEffect } from 'react';
 import { useRouter } from 'next/router';
+import { useContext, useEffect } from 'react';
 import styled from 'styled-components';
+import EmotionsSummary from '../components/EmotionsSummary';
 import Layout from '../components/Layout';
 import { AuthContext } from '../context/AuthContext';
 
@@ -67,14 +68,14 @@ const CardLink = styled.a`
 export default function Dashboard() {
   const { user, loading } = useContext(AuthContext);
   const router = useRouter();
-  
+
   // Basic auth protection
   useEffect(() => {
     if (!loading && !user) {
       router.push('/login');
     }
   }, [loading, user, router]);
-  
+
   if (loading || !user) {
     return (
       <Layout title="Panel - Terapia Emocional">
@@ -82,15 +83,16 @@ export default function Dashboard() {
       </Layout>
     );
   }
-  
+
   return (
     <Layout title="Panel - Terapia Emocional">
       <DashboardContainer>
         <WelcomeCard>
           <Title>¡Bienvenido, {user.name}!</Title>
           <Subtitle>Aquí tienes un resumen de tu bienestar emocional</Subtitle>
+          <EmotionsSummary />
         </WelcomeCard>
-        
+
         <Grid>
           <Card>
             <CardTitle>Seguimiento Emocional</CardTitle>
@@ -101,7 +103,7 @@ export default function Dashboard() {
               Seguimiento de Emociones
             </CardLink>
           </Card>
-          
+
           <Card>
             <CardTitle>Recordatorios</CardTitle>
             <CardText>
@@ -111,7 +113,7 @@ export default function Dashboard() {
               Próximamente
             </CardLink>
           </Card>
-          
+
           <Card>
             <CardTitle>Compartir con Terapeuta</CardTitle>
             <CardText>
@@ -122,7 +124,7 @@ export default function Dashboard() {
             </CardLink>
           </Card>
         </Grid>
-        
+
         {/* TODO: Add charts and statistics */}
       </DashboardContainer>
     </Layout>

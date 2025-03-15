@@ -20,20 +20,20 @@ export const AuthProvider = ({ children }) => {
   // Register user
   const register = async (userData) => {
     const res = await axios.post(`${API_URL}/users/register`, userData);
-    
+
     setUser(res.data);
     Cookie.set('token', res.data.token);
-    
+
     router.push('/dashboard');
   };
 
   // Login user
   const login = async (userData) => {
     const res = await axios.post(`${API_URL}/users/login`, userData);
-    
+
     setUser(res.data);
     Cookie.set('token', res.data.token);
-    
+
     router.push('/dashboard');
   };
 
@@ -47,7 +47,7 @@ export const AuthProvider = ({ children }) => {
   // Check if user is logged in
   const checkUserLoggedIn = async () => {
     const token = Cookie.get('token');
-    
+
     if (token) {
       try {
         const res = await axios.get(`${API_URL}/users/profile`, {
@@ -55,7 +55,7 @@ export const AuthProvider = ({ children }) => {
             Authorization: `Bearer ${token}`
           }
         });
-        
+
         setUser(res.data);
       } catch (error) {
         Cookie.remove('token');
@@ -64,24 +64,24 @@ export const AuthProvider = ({ children }) => {
     } else {
       setUser(null);
     }
-    
+
     setLoading(false);
   };
 
   const updateProfile = async (userData) => {
     const token = Cookie.get('token');
-    
+
     if (token) {
       const res = await axios.put(`${API_URL}/users/profile`, userData, {
         headers: {
           Authorization: `Bearer ${token}`
         }
       });
-      
+
       setUser(res.data);
       return res.data;
     }
-    
+
     return null;
   };
 

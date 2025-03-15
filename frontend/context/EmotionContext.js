@@ -17,19 +17,19 @@ export const EmotionProvider = ({ children }) => {
     try {
       setLoading(true);
       const token = Cookie.get('token');
-      
+
       if (!token) {
         setEmotions([]);
         setLoading(false);
         return;
       }
-      
+
       const res = await axios.get(`${API_URL}/emotions`, {
         headers: {
           Authorization: `Bearer ${token}`
         }
       });
-      
+
       setEmotions(res.data);
     } catch (error) {
       console.error('Error fetching emotions');
@@ -46,11 +46,37 @@ export const EmotionProvider = ({ children }) => {
       ...emotionData,
       date: new Date().toISOString()
     };
-    
+
     setEmotions(prev => [newEmotion, ...prev]);
-    
+
     // TODO: Connect to backend API
   };
+
+  const getEmotionsSummary = async () => {
+    try {
+      setLoading(true);
+      const token = Cookie.get('token');
+
+      if (!token) {
+        setEmotions([]);
+        setLoading(false);
+        return;
+      }
+
+      const res = await axios.get(`${API_URL}/emotions/analytics/summary`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+
+      setEmotions(res.data);
+    } catch (error) {
+      console.error('Error fetching emotions summary');
+    } finally {
+      setLoading(false);
+    }
+  };
+
 
   const shareWithTherapist = async (emotionIds) => {
     // TODO: Implement sharing with therapist
@@ -64,6 +90,7 @@ export const EmotionProvider = ({ children }) => {
         loading,
         getEmotions,
         addEmotion,
+        getEmotionsSummary,
         shareWithTherapist
       }}
     >

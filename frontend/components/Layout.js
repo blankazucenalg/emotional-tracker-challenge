@@ -23,10 +23,10 @@ const Layout = ({ title, description, children }) => {
       </Head>
 
       <Header />
-      
+
       <Main>
         {/* No loading indicator */}
-        {children}
+        {loading ? (<p>Cargando...</p>) : children}
       </Main>
     </>
   );

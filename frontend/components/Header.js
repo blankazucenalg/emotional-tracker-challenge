@@ -48,7 +48,7 @@ const Header = () => {
             <a>TerapiaEmocional</a>
           </Link>
         </Logo>
-        
+
         <NavLinks>
           {user ? (
             <>
@@ -57,6 +57,9 @@ const Header = () => {
               </Link>
               <Link href="/emotions">
                 <NavLink>Emociones</NavLink>
+              </Link>
+              <Link href="/profile">
+                <NavLink>{user.name}</NavLink>
               </Link>
               <NavLink onClick={logout}>Cerrar Sesión</NavLink>
             </>
