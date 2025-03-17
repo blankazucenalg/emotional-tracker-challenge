@@ -11,8 +11,11 @@ const generateToken = (id) => {
 };
 
 const updateUserProfile = async (req, res, next) => {
+  const authUser = req.user._id;
   const { _id, name, email, oldPassword, newPassword } = req.body;
-
+  if (authUser !== _id) {
+    res.send(401).json({ message: 'You cannot update another user profile.' });
+  }
   try {
     // Check if user already exists with that email
     const userExists = await User.findOne({ email });

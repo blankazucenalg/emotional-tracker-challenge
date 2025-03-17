@@ -71,7 +71,7 @@ export async function getServerSideProps() {
   if (!token) {
     return { props: { emotionsSummary: [] } };
   }
-  const res = await fetch('http://localhost:5050/api/emotions/analytics/summary',{
+  const res = await fetch('http://localhost:5050/api/emotions/analytics/summary', {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
@@ -83,7 +83,7 @@ export async function getServerSideProps() {
   return { props: { emotionsSummary } }
 }
 
-export default function Dashboard({emotionsSummary}) {
+export default function Dashboard({ emotionsSummary }) {
   const { user, loading } = useContext(AuthContext);
   const router = useRouter();
 
@@ -108,11 +108,7 @@ export default function Dashboard({emotionsSummary}) {
         <WelcomeCard>
           <Title>¡Bienvenido, {user.name}!</Title>
           <Subtitle>Aquí tienes un resumen de tu bienestar emocional</Subtitle>
-<<<<<<< Updated upstream
           <EmotionsSummary />
-=======
-          <EmotionsSummary data={emotionsSummary}/>
->>>>>>> Stashed changes
         </WelcomeCard>
 
         <Grid>

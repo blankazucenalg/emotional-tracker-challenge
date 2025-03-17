@@ -58,11 +58,7 @@ const Header = () => {
               <Link href="/emotions">
                 <NavLink>Emociones</NavLink>
               </Link>
-<<<<<<< Updated upstream
               <Link href="/profile">
-=======
-              <Link href={`/profile`}>
->>>>>>> Stashed changes
                 <NavLink>{user.name}</NavLink>
               </Link>
               <NavLink onClick={logout}>Cerrar Sesión</NavLink>
