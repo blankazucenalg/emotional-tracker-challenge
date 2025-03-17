@@ -5,7 +5,11 @@ const session = require('express-session');
 const helmet = require("helmet");
 const userRoutes = require('./routes/userRoutes');
 const emotionRoutes = require('./routes/emotionRoutes');
+<<<<<<< Updated upstream
 const cookieParser = require('cookie-parser');
+=======
+const { errorHandler } = require('./middlewares/errorHandler');
+>>>>>>> Stashed changes
 
 const app = express();
 
@@ -53,6 +57,8 @@ app.get('/api/status', (req, res) => {
 app.use((req, res) => {
   res.status(404).json({ message: 'Not found' });
 });
+
+app.use(errorHandler);
 
 // Error handling middleware
 // TODO: Implement proper error handling middleware

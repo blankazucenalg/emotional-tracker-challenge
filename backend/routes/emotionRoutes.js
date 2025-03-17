@@ -15,9 +15,15 @@ router.route('/')
   .get(protect, getEmotions)
   .post(protect, createEmotion);
 
+<<<<<<< Updated upstream
 router.get('/:id', protect, getEmotionById);
+=======
+router.route('/:id')
+  .get(protect, getEmotionById)
+  .put(protect, updateEmotion);
+>>>>>>> Stashed changes
 
-router.put('/:id', protect, updateEmotion);
+router.get('/analytics/summary', protect, getEmotionsSummary);
 
 router.route('/analytics/summary')
   .get(protect, getEmotionsSummary);

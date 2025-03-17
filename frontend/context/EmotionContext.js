@@ -8,6 +8,7 @@ const API_URL = 'http://localhost:5050/api';
 export const EmotionContext = createContext();
 
 export const EmotionProvider = ({ children }) => {
+  const [emotionsSummary, setEmotionsSummary] = useState([]);
   const [emotions, setEmotions] = useState([]);
   const [loading, setLoading] = useState(false);
 
@@ -58,7 +59,11 @@ export const EmotionProvider = ({ children }) => {
       const token = Cookie.get('token');
 
       if (!token) {
+<<<<<<< Updated upstream
         setEmotions([]);
+=======
+        setEmotionsSummary([]);
+>>>>>>> Stashed changes
         setLoading(false);
         return;
       }
@@ -69,7 +74,11 @@ export const EmotionProvider = ({ children }) => {
         }
       });
 
+<<<<<<< Updated upstream
       setEmotions(res.data);
+=======
+      setEmotionsSummary(res.data);
+>>>>>>> Stashed changes
     } catch (error) {
       console.error('Error fetching emotions summary');
     } finally {
@@ -77,7 +86,10 @@ export const EmotionProvider = ({ children }) => {
     }
   };
 
+<<<<<<< Updated upstream
 
+=======
+>>>>>>> Stashed changes
   const shareWithTherapist = async (emotionIds) => {
     // TODO: Implement sharing with therapist
     console.log('Sharing emotions with therapist:', emotionIds);
@@ -91,6 +103,10 @@ export const EmotionProvider = ({ children }) => {
         getEmotions,
         addEmotion,
         getEmotionsSummary,
+<<<<<<< Updated upstream
+=======
+        emotionsSummary,
+>>>>>>> Stashed changes
         shareWithTherapist
       }}
     >

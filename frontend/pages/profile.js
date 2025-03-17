@@ -1,4 +1,4 @@
-import { useState, useContext } from 'react';
+import { useState, useContext, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import styled from 'styled-components';
@@ -69,47 +69,59 @@ const LinkText = styled.p`
   }
 `;
 
-export default function Register() {
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    password: '',
-    confirmPassword: ''
-  });
-  
-  const { register } = useContext(AuthContext);
+export default function Profile() {
+  const { user, updateProfile } = useContext(AuthContext);
   const router = useRouter();
-  
+  const [formData, setFormData] = useState({
+    name: user ? user.name : '',
+    email: user ? user.email : '',
+    phone: user ? user.phone : '',
+    oldPassword: '',
+    newPassword: ''
+  });
+
+  useEffect(() => {
+    setFormData({
+      name: user ? user.name : '',
+      email: user ? user.email : '',
+      phone: user ? user.phone : '',
+      oldPassword: '',
+      newPassword: ''
+    });
+  }, [user])
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
-  
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    if (formData.password !== formData.confirmPassword) {
-      alert('Passwords do not match');
+
+    if (formData.oldPassword !== '' && formData.newPassword !== '' && formData.oldPassword === formData.newPassword) {
+      alert('Password cannot be the same as before');
       return;
     }
-    
+
     try {
-      await register({
+      await updateProfile({
+        _id: user._id,
         name: formData.name,
         email: formData.email,
-        password: formData.password
+        oldPassword: formData.oldPassword,
+        newPassword: formData.newPassword
       });
     } catch (error) {
       console.error('Registration error:', error.response?.data?.message || 'Unknown error');
-      alert('Failed to register');
+      alert('Failed to update');
     }
   };
-  
+
   return (
     <Layout title="Registro - Terapia Emocional">
       <FormContainer>
         <Title>Crear una Cuenta</Title>
-        
+
         <Form onSubmit={handleSubmit}>
           <FormGroup>
             <Label htmlFor="name">Nombre</Label>
@@ -118,11 +130,11 @@ export default function Register() {
               id="name"
               name="name"
               value={formData.name}
-              required
               onChange={handleChange}
+              required
             />
           </FormGroup>
-          
+
           <FormGroup>
             <Label htmlFor="email">Correo Electrónico</Label>
             <Input
@@ -134,9 +146,26 @@ export default function Register() {
               required
             />
           </FormGroup>
-          
+
           <FormGroup>
-            <Label htmlFor="password">Contraseña</Label>
+            <Label htmlFor="email">Teléfono</Label>
+            <Input
+              type="phone"
+              id="phone"
+              name="phone"
+              value={formData.phone}
+              onChange={handleChange}
+              required
+            />
+          </FormGroup>
+          <Button type="submit">Actualizar datos</Button>
+        </Form>
+
+        <Title>Actualizar contraseña</Title>
+
+        <Form onSubmit={handleSubmit}>
+          <FormGroup>
+            <Label htmlFor="password">Contraseña actual</Label>
             <Input
               type="password"
               id="password"
@@ -146,25 +175,22 @@ export default function Register() {
               required
             />
           </FormGroup>
-          
+
           <FormGroup>
-            <Label htmlFor="confirmPassword">Confirmar Contraseña</Label>
+            <Label htmlFor="newPassword">Nueva Contraseña</Label>
             <Input
               type="password"
-              id="confirmPassword"
-              name="confirmPassword"
-              value={formData.confirmPassword}
+              id="newPassword"
+              name="newPassword"
+              value={formData.newPassword}
               onChange={handleChange}
               required
             />
           </FormGroup>
-          
-          <Button type="submit">Registrarse</Button>
+
+          <Button type="submit">Actualizar contraseña</Button>
         </Form>
-        
-        <LinkText>
-          ¿Ya tienes una cuenta? <Link href="/login"><a>Inicia Sesión</a></Link>
-        </LinkText>
+
       </FormContainer>
     </Layout>
   );

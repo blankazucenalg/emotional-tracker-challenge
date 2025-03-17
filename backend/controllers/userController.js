@@ -10,63 +10,111 @@ const generateToken = (id) => {
   });
 };
 
-// Register a new user
-const registerUser = async (req, res) => {
-  const { name, email, password } = req.body;
+const updateUserProfile = async (req, res, next) => {
+  const { _id, name, email, oldPassword, newPassword } = req.body;
 
-  // Check if user already exists
-  const userExists = await User.findOne({ email });
+  try {
+    // Check if user already exists with that email
+    const userExists = await User.findOne({ email });
+    if (userExists) {
+      res.status(400).json({ message: 'User already exists' });
+      return;
+    }
 
-  if (userExists) {
-    res.status(400).json({ message: 'User already exists' });
-    return;
-  }
-
-  const user = await User.create({
-    name,
-    email,
-    password
-  });
-
-  if (user) {
-    res.status(201).json({
-      _id: user._id,
-      name: user.name,
-      email: user.email,
-      token: generateToken(user._id)
+    const user = await User.updateOne({ _id: _id }, {
+      $set: {
+        name,
+        email
+      }
     });
-  } else {
-    res.status(400).json({ message: 'Invalid user data' });
+
+    if (user) {
+      res.status(201).json({
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+      });
+    } else {
+      res.status(400).json({ message: 'Invalid user data' });
+    }
+  } catch (err) {
+    next(err);
   }
 };
 
 // Login user
-const loginUser = async (req, res) => {
+const loginUser = async (req, res, next) => {
   const { email, password } = req.body;
+  try {
 
-  const user = await User.findOne({ email });
+    const user = await User.findOne({ email });
 
-  if (user && user.matchPassword(password)) {
-    res.json({
-      _id: user._id,
-      name: user.name,
-      email: user.email,
-      token: generateToken(user._id)
-    });
-  } else {
-    res.status(401).json({ message: 'Invalid email or password' });
+    if (user && user.matchPassword(password)) {
+      res.json({
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        token: generateToken(user._id)
+      });
+    } else {
+      res.status(401).json({ message: 'Invalid email or password' });
+    }
+  } catch (err) {
+    next(err);
   }
 };
 
 // Get user profile
-const getUserProfile = async (req, res) => {
-  const user = await User.findById(req.user._id);
+const getUserProfile = async (req, res, next) => {
+  const userId = req.params.id
+  if (!req.user || !req.user._id) {
+    res.send(400).json({ message: 'Bad request. Missing user id' });
+    return;
+  }
+  try {
+    const user = await User.findById(req.user._id);
 
-  res.json({
-    _id: user._id,
-    name: user.name,
-    email: user.email
-  });
+    res.json({
+      _id: user._id,
+      name: user.name,
+      email: user.email
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+const registerUser = async (req, res, next) => {
+  const { name, email, password } = req.body;
+
+  try {
+    // Check if user already exists
+    const userExists = await User.findOne({ email });
+
+    if (userExists) {
+      res.status(400).json({ message: 'User already exists' });
+      return;
+    }
+
+    const user = await User.create({
+      name,
+      email,
+      password
+    });
+
+    if (user) {
+      res.status(201).json({
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        token: generateToken(user._id)
+      });
+    } else {
+      res.status(400).json({ message: 'Invalid user data' });
+    }
+  } catch (err) {
+    next(err);
+  }
 };
 
 // TODO: Implement user update endpoint
@@ -75,5 +123,6 @@ const getUserProfile = async (req, res) => {
 module.exports = {
   registerUser,
   loginUser,
-  getUserProfile
+  getUserProfile,
+  updateUserProfile
 };

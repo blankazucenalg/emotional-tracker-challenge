@@ -13,7 +13,7 @@ const emotionSchema = new mongoose.Schema({
   emotion: {
     type: String,
     required: true,
-    enum: ['happy', 'sad', 'angry', 'anxious', 'neutral']
+    enum: {values: ['happy', 'sad', 'angry', 'anxious', 'neutral'], message: '{VALUE} is not supported yet'}
   },
   intensity: {
     type: Number,

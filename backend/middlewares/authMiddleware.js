@@ -16,7 +16,11 @@ const protect = async (req, res, next) => {
       const decoded = jwt.verify(token, JWT_SECRET);
 
       // Inefficient query - not using projection
+<<<<<<< Updated upstream
       req.user = await User.findById(decoded.id, { role: 1 });
+=======
+      req.user = await User.findById(decoded.id);
+>>>>>>> Stashed changes
 
       next();
     } catch (error) {

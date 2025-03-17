@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import EmotionsSummary from '../components/EmotionsSummary';
 import Layout from '../components/Layout';
 import { AuthContext } from '../context/AuthContext';
+import Cookie from 'js-cookie';
 
 const DashboardContainer = styled.div`
   display: flex;
@@ -65,7 +66,24 @@ const CardLink = styled.a`
   }
 `;
 
-export default function Dashboard() {
+export async function getServerSideProps() {
+  const token = Cookie.get('token');
+  if (!token) {
+    return { props: { emotionsSummary: [] } };
+  }
+  const res = await fetch('http://localhost:5050/api/emotions/analytics/summary',{
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`
+    }
+  });
+  const emotionsSummary = await res.json();
+  // Pass data to the page via props
+  return { props: { emotionsSummary } }
+}
+
+export default function Dashboard({emotionsSummary}) {
   const { user, loading } = useContext(AuthContext);
   const router = useRouter();
 
@@ -90,7 +108,11 @@ export default function Dashboard() {
         <WelcomeCard>
           <Title>¡Bienvenido, {user.name}!</Title>
           <Subtitle>Aquí tienes un resumen de tu bienestar emocional</Subtitle>
+<<<<<<< Updated upstream
           <EmotionsSummary />
+=======
+          <EmotionsSummary data={emotionsSummary}/>
+>>>>>>> Stashed changes
         </WelcomeCard>
 
         <Grid>
