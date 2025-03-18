@@ -17,27 +17,29 @@ const EmptyState = styled.p`
 const EmotionList = styled.div`
   display: flex;
   flex-direction: row;
-  gap: 1rem;
+  gap: 0;
 `;
 
 const EmotionCard = styled.div`
   border: 1px solid #ddd;
-  border-radius: 4px;
-  padding: 1rem;
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  height: 60px;
+  justify-content: center;
+
+  &.happy { background-color: #27ae60; }
+  &.sad { background-color: #2980b9; }
+  &.angry { background-color: #c0392b; }
+  &.anxious { background-color: #f39c12; }
+  &.neutral { background-color: #7f8c8d; }
 `;
 
-const EmotionName = styled.span`
+const EmotionPart = styled.div`
   font-weight: bold;
   text-transform: capitalize;
-  
-  &.happy { color: #27ae60; }
-  &.sad { color: #2980b9; }
-  &.angry { color: #c0392b; }
-  &.anxious { color: #f39c12; }
-  &.neutral { color: #7f8c8d; }
+  text-align:center;
+  display: flex;
+  flex-direction: column;
 `;
 
 const EmotionDatum = styled.div`
@@ -49,9 +51,9 @@ const EmotionDatum = styled.div`
   }
 `;
 
-const EmotionDate = styled.span`
-  color: #7f8c8d;
-  font-size: 0.9rem;
+const EmotionPercentage = styled.span`
+  color:rgb(36, 37, 37);
+  font-size: 0.8rem;
 `;
 
 const formatDate = (dateString) => {
@@ -59,12 +61,12 @@ const formatDate = (dateString) => {
   return date.toLocaleString();
 };
 
-const EmotionsSummary = () => {
-  const { emotionsSummary, loading, getEmotionsSummary } = useContext(EmotionContext);
+const EmotionsComposition = () => {
+  const { emotionsComposition, loading, getEmotionsComposition } = useContext(EmotionContext);
 
   // Fetch emotions on component mount
   useEffect(() => {
-    getEmotionsSummary();
+    getEmotionsComposition();
   }, []);
 
   const translateEmotion = (emotion) => {
@@ -82,25 +84,16 @@ const EmotionsSummary = () => {
     <HistoryContainer>
       {loading ? (
         <p>Cargando...</p>
-      ) : emotionsSummary.length === 0 ? (
+      ) : emotionsComposition.length === 0 ? (
         <EmptyState>No hay emociones registradas aún. ¡Comienza a hacer seguimiento de tus emociones arriba!</EmptyState>
       ) : (
         <EmotionList>
-          {emotionsSummary.map((emotion) => (
-            <EmotionCard key={emotion.id || emotion._id}>
-              <EmotionName className={emotion.emotion}>
-                {translateEmotion(emotion.emotion)}
-              </EmotionName>
-
-              <EmotionDatum>
-                Veces registrada: <span>{emotion.count}</span>
-              </EmotionDatum>
-
-              <EmotionDatum>
-                Intensidad promedio: <span>{emotion.averageIntensity.toLocaleString()}/10</span>
-              </EmotionDatum>
-
-              <EmotionDate>Última vez registrada: {formatDate(emotion.lastDate)}</EmotionDate>
+          {emotionsComposition.map((emotion) => (
+            <EmotionCard key={emotion.id || emotion._id} className={emotion.emotion} style={{ width: `${emotion.percentage}%` }}>
+              <EmotionPart>
+                <span>{translateEmotion(emotion.emotion)}</span>
+                <EmotionPercentage>{emotion.percentage.toLocaleString()}%</EmotionPercentage>
+              </EmotionPart>
             </EmotionCard>
           ))}
         </EmotionList>
@@ -109,4 +102,4 @@ const EmotionsSummary = () => {
   );
 };
 
-export default EmotionsSummary;
+export default EmotionsComposition;

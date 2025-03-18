@@ -20,7 +20,10 @@
     "express-useragent": "^1.0.15",
     "helmet": "^8.0.0",
     "jsonwebtoken": "^8.5.1",
-    "mongoose": "^6.0.12"
+    "mongoose": "^6.0.12",
+    "node-cron": "^3.0.3",
+    "nodemailer": "^6.10.0",
+    "validator": "^13.12.0"
   },
   "devDependencies": {
     "nodemon": "^2.0.14"

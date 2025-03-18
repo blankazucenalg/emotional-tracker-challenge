@@ -2,6 +2,7 @@ import { createContext, useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Cookie from 'js-cookie';
 import axios from 'axios';
+import { resetAlerts } from '../lib/alertNotifications';
 
 // API URL
 const API_URL = 'http://localhost:5050/api';
@@ -41,6 +42,7 @@ export const AuthProvider = ({ children }) => {
   const logout = () => {
     Cookie.remove('token');
     setUser(null);
+    resetAlerts();
     router.push('/');
   };
 
@@ -85,6 +87,23 @@ export const AuthProvider = ({ children }) => {
     return null;
   };
 
+  const updatePassword = async (userData) => {
+    const token = Cookie.get('token');
+
+    if (token) {
+      const res = await axios.put(`${API_URL}/users/updatePassword`, userData, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+
+      setUser(res.data);
+      return res.data;
+    }
+
+    return null;
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -93,7 +112,8 @@ export const AuthProvider = ({ children }) => {
         register,
         login,
         logout,
-        updateProfile
+        updateProfile,
+        updatePassword
       }}
     >
       {children}

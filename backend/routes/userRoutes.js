@@ -1,5 +1,5 @@
 const express = require('express');
-const { registerUser, loginUser, getUserProfile, updateUserProfile } = require('../controllers/userController');
+const { registerUser, loginUser, getUserProfile, updateUserProfile, updateUserPassword } = require('../controllers/userController');
 const { protect } = require('../middlewares/authMiddleware');
 
 const router = express.Router();
@@ -12,6 +12,8 @@ router.post('/login', loginUser);
 router.route('/profile')
     .get(protect, getUserProfile)
     .put(protect, updateUserProfile);
+
+router.put('/updatePassword', protect, updateUserPassword);
 
 // TODO: Add routes for updating user profile and resetting password
 

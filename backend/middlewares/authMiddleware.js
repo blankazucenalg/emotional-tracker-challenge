@@ -16,12 +16,10 @@ const protect = async (req, res, next) => {
       const decoded = jwt.verify(token, JWT_SECRET);
 
       // Inefficient query - not using projection
-<<<<<<< Updated upstream
       req.user = await User.findById(decoded.id, { role: 1 });
-=======
-      req.user = await User.findById(decoded.id);
->>>>>>> Stashed changes
-
+      if (!req.user) {
+        res.status(401).json({ message: 'Not authorized, user not found' });
+      }
       next();
     } catch (error) {
       res.status(401).json({ message: 'Not authorized, token failed' });

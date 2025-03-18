@@ -70,67 +70,96 @@ const LinkText = styled.p`
 `;
 
 export default function Profile() {
-  const { user, updateProfile } = useContext(AuthContext);
+  const { user, updateProfile, updatePassword } = useContext(AuthContext);
   const router = useRouter();
-  const [formData, setFormData] = useState({
+  const [formDataProfile, setFormDataProfile] = useState({
     name: user ? user.name : '',
     email: user ? user.email : '',
-    phone: user ? user.phone : '',
+    phone: user ? user.phone : ''
+  });
+  const [formDataPassword, setFormDataPassword] = useState({
     oldPassword: '',
     newPassword: ''
   });
 
   useEffect(() => {
-    setFormData({
+    setFormDataProfile({
       name: user ? user.name : '',
       email: user ? user.email : '',
-      phone: user ? user.phone : '',
-      oldPassword: '',
-      newPassword: ''
+      phone: user ? user.phone : ''
     });
   }, [user])
 
-  const handleChange = (e) => {
+  const handleChangeProfile = (e) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+    setFormDataProfile({ ...formDataProfile, [name]: value });
+  };
+  const handleChangePassword = (e) => {
+    const { name, value } = e.target;
+    setFormDataPassword({ ...formDataPassword, [name]: value });
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmitProfile = async (e) => {
     e.preventDefault();
 
-    if (formData.oldPassword !== '' && formData.newPassword !== '' && formData.oldPassword === formData.newPassword) {
-      alert('Password cannot be the same as before');
+    if (formDataProfile.name.trim() === '') {
+      alert('User name cannot be empty or spaces only');
+      return;
+    }
+    if (formDataProfile.email.trim() === '') {
+      alert('Email cannot be empty or spaces only');
       return;
     }
 
     try {
       await updateProfile({
         _id: user._id,
-        name: formData.name,
-        email: formData.email,
-        oldPassword: formData.oldPassword,
-        newPassword: formData.newPassword
+        name: formDataProfile.name,
+        email: formDataProfile.email,
+        phone: formDataProfile.phone
       });
+      alert('Profile was updated');
     } catch (error) {
       console.error('Registration error:', error.response?.data?.message || 'Unknown error');
-      alert('Failed to update');
+      alert(error.response?.data?.message || 'Failed to update');
+    }
+  };
+
+  const handleSubmitPassword = async (e) => {
+    e.preventDefault();
+
+    if (formDataPassword.oldPassword !== '' && formDataPassword.newPassword !== '' && formDataPassword.oldPassword === formDataPassword.newPassword) {
+      alert('Password cannot be the same as before');
+      return;
+    }
+
+    try {
+      await updatePassword({
+        _id: user._id,
+        oldPassword: formDataPassword.oldPassword,
+        newPassword: formDataPassword.newPassword
+      });
+      alert('Password was updated');
+    } catch (error) {
+      console.error('Registration error:', error.response?.data?.message || 'Unknown error');
+      alert(error.response?.data?.message || 'Failed to update password');
     }
   };
 
   return (
     <Layout title="Registro - Terapia Emocional">
       <FormContainer>
-        <Title>Crear una Cuenta</Title>
+        <Title>Actualizar mi información</Title>
 
-        <Form onSubmit={handleSubmit}>
+        <Form onSubmit={handleSubmitProfile}>
           <FormGroup>
             <Label htmlFor="name">Nombre</Label>
             <Input
               type="text"
               id="name"
               name="name"
-              value={formData.name}
-              onChange={handleChange}
+              value={formDataProfile.name}
+              onChange={handleChangeProfile}
               required
             />
           </FormGroup>
@@ -141,8 +170,8 @@ export default function Profile() {
               type="email"
               id="email"
               name="email"
-              value={formData.email}
-              onChange={handleChange}
+              value={formDataProfile.email}
+              onChange={handleChangeProfile}
               required
             />
           </FormGroup>
@@ -153,25 +182,27 @@ export default function Profile() {
               type="phone"
               id="phone"
               name="phone"
-              value={formData.phone}
-              onChange={handleChange}
+              value={formDataProfile.phone}
+              onChange={handleChangeProfile}
               required
             />
           </FormGroup>
           <Button type="submit">Actualizar datos</Button>
         </Form>
+      </FormContainer>
 
+      <FormContainer>
         <Title>Actualizar contraseña</Title>
 
-        <Form onSubmit={handleSubmit}>
+        <Form onSubmit={handleSubmitPassword}>
           <FormGroup>
-            <Label htmlFor="password">Contraseña actual</Label>
+            <Label htmlFor="oldPassword">Contraseña actual</Label>
             <Input
               type="password"
-              id="password"
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
+              id="oldPassword"
+              name="oldPassword"
+              value={formDataPassword.password}
+              onChange={handleChangePassword}
               required
             />
           </FormGroup>
@@ -182,8 +213,8 @@ export default function Profile() {
               type="password"
               id="newPassword"
               name="newPassword"
-              value={formData.newPassword}
-              onChange={handleChange}
+              value={formDataPassword.newPassword}
+              onChange={handleChangePassword}
               required
             />
           </FormGroup>

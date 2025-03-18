@@ -3,6 +3,7 @@ import { useRouter } from 'next/router';
 import styled from 'styled-components';
 import Layout from '../components/Layout';
 import { AuthContext } from '../context/AuthContext';
+import Notifications from '../components/Notifications';
 
 const Hero = styled.div`
   text-align: center;
@@ -70,7 +71,7 @@ const FeatureDescription = styled.p`
 export default function Home() {
   const { user } = useContext(AuthContext);
   const router = useRouter();
-  
+
   return (
     <Layout
       title="Terapia Emocional - Seguimiento de tu bienestar mental"
@@ -81,7 +82,7 @@ export default function Home() {
         <Subtitle>
           Monitorea tus emociones, identifica patrones y comparte descubrimientos con tu terapeuta.
         </Subtitle>
-        
+
         <ButtonGroup>
           {user ? (
             <Button primary onClick={() => router.push('/dashboard')}>
@@ -99,7 +100,7 @@ export default function Home() {
           )}
         </ButtonGroup>
       </Hero>
-      
+
       <Features>
         <FeatureCard>
           <FeatureTitle>Seguimiento Diario</FeatureTitle>
@@ -107,14 +108,14 @@ export default function Home() {
             Registra tus emociones y su intensidad para hacer un seguimiento de tu bienestar mental.
           </FeatureDescription>
         </FeatureCard>
-        
+
         <FeatureCard>
           <FeatureTitle>Identifica Patrones</FeatureTitle>
           <FeatureDescription>
             Descubre patrones en tu salud emocional y comprende los desencadenantes.
           </FeatureDescription>
         </FeatureCard>
-        
+
         <FeatureCard>
           <FeatureTitle>Comparte con tu Terapeuta</FeatureTitle>
           <FeatureDescription>
@@ -122,6 +123,7 @@ export default function Home() {
           </FeatureDescription>
         </FeatureCard>
       </Features>
+
     </Layout>
   );
 }

@@ -73,17 +73,17 @@ export default function Login() {
     email: '',
     password: ''
   });
-  
+
   const { login } = useContext(AuthContext);
-  
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
-  
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     try {
       await login(formData);
     } catch (error) {
@@ -91,12 +91,12 @@ export default function Login() {
       alert('Failed to login');
     }
   };
-  
+
   return (
     <Layout title="Iniciar Sesión - Terapia Emocional">
       <FormContainer>
         <Title>Inicia Sesión en tu Cuenta</Title>
-        
+
         <Form onSubmit={handleSubmit}>
           <FormGroup>
             <Label htmlFor="email">Correo Electrónico</Label>
@@ -109,7 +109,7 @@ export default function Login() {
               required
             />
           </FormGroup>
-          
+
           <FormGroup>
             <Label htmlFor="password">Contraseña</Label>
             <Input
@@ -121,10 +121,10 @@ export default function Login() {
               required
             />
           </FormGroup>
-          
+
           <Button type="submit">Iniciar Sesión</Button>
         </Form>
-        
+
         <LinkText>
           ¿No tienes una cuenta? <Link href="/register"><a>Regístrate</a></Link>
         </LinkText>

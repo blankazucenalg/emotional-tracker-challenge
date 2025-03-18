@@ -5,6 +5,8 @@ import EmotionsSummary from '../components/EmotionsSummary';
 import Layout from '../components/Layout';
 import { AuthContext } from '../context/AuthContext';
 import Cookie from 'js-cookie';
+import Notifications from '../components/Notifications';
+import EmotionsComposition from '../components/EmotionsComposition';
 
 const DashboardContainer = styled.div`
   display: flex;
@@ -108,8 +110,13 @@ export default function Dashboard({ emotionsSummary }) {
         <WelcomeCard>
           <Title>¡Bienvenido, {user.name}!</Title>
           <Subtitle>Aquí tienes un resumen de tu bienestar emocional</Subtitle>
+
+          {/* TODO: Add charts and statistics */}
           <EmotionsSummary />
+          <EmotionsComposition />
         </WelcomeCard>
+
+
 
         <Grid>
           <Card>
@@ -127,8 +134,8 @@ export default function Dashboard({ emotionsSummary }) {
             <CardText>
               Configura recordatorios para actividades que mejoran tu salud mental.
             </CardText>
-            <CardLink>
-              Próximamente
+            <CardLink onClick={() => router.push('/reminders')}>
+              Configurar recordatorios
             </CardLink>
           </Card>
 
@@ -143,8 +150,10 @@ export default function Dashboard({ emotionsSummary }) {
           </Card>
         </Grid>
 
-        {/* TODO: Add charts and statistics */}
       </DashboardContainer>
+
+      <Notifications />
+
     </Layout>
   );
 }
