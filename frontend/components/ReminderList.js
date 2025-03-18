@@ -65,10 +65,26 @@ const ReminderIntensity = styled.div`
   }
 `;
 
-const ReminderNotes = styled.p`
-  margin: 0;
-  color: #34495e;
+const ReminderActions = styled.div`
+  display: flex;
+  flex-direction: row-reverse;
 `;
+
+const Button = styled.button`
+  background-color: #3CABDB;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 0.5rem 0.7rem;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+
+  &:hover {
+    background-color: #2980b9;
+  }
+`;
+
 
 const formatDate = (dateString) => {
   const date = new Date(dateString);
@@ -80,12 +96,17 @@ const getWeekdays = (weekdaysObj) => {
 }
 
 const ReminderList = () => {
-  const { reminders, loading, getReminders } = useContext(ReminderContext);
+  const { reminders, loading, getReminders, deleteReminder } = useContext(ReminderContext);
 
   // Fetch reminders on component mount
   useEffect(() => {
     getReminders();
   }, []);
+
+  const handleDelete = (event) => {
+    const id = event.target.id.replace('delete-', '');
+    deleteReminder(id);
+  }
 
   return (
     <HistoryContainer>
@@ -116,6 +137,9 @@ const ReminderList = () => {
                 Hora de recordatorio: <span>{reminder.time} HRS</span>
               </ReminderIntensity>
 
+              <ReminderActions>
+                <Button id={`delete-${reminder._id}`} onClick={handleDelete}>Eliminar</Button>
+              </ReminderActions>
 
             </ReminderCard>
           ))}

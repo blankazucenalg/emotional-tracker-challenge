@@ -68,7 +68,7 @@ export const ReminderProvider = ({ children }) => {
 		}
 	};
 
-	const deleteReminder = async (reminderData) => {
+	const deleteReminder = async (reminderId) => {
 		try {
 			setLoading(true);
 			const token = Cookie.get('token');
@@ -76,14 +76,14 @@ export const ReminderProvider = ({ children }) => {
 				setLoading(false);
 				return;
 			}
-			const res = await axios.delete(`${API_URL}/reminders/${reminderData._id}`, {
+			const res = await axios.delete(`${API_URL}/reminders/${reminderId}`, {
 				headers: {
 					Authorization: `Bearer ${token}`
 				}
 			})
 
 			if (res.data) {
-				setReminders(reminders.filter(r => r._id !== reminderData._id));
+				setReminders(reminders.filter(r => r._id !== reminderId));
 				setReminderNotifications();
 			}
 		} catch (err) {
