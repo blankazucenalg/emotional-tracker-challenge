@@ -13,6 +13,19 @@ const reminderSchema = new mongoose.Schema({
   },
   activityName: {
     type: String,
+    enum: [
+      'Seguimiento de emoción',
+      'Actividad física',
+      'Diario de gratitud',
+      'Práctica de mindfulness',
+      'Recordatorio de acto solidario',
+      'Tiempo con tu mascota',
+      'Contacto con la naturaleza',
+      'Actividad para romper la monotonía',
+      'Práctica de yoga',
+      'Hora de dormir',
+      'Tiempo de socializar'
+    ],
     required: true
   },
   weekDays: {
