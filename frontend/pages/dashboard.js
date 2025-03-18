@@ -1,12 +1,11 @@
+import Cookie from 'js-cookie';
 import { useRouter } from 'next/router';
 import { useContext, useEffect } from 'react';
 import styled from 'styled-components';
+import EmotionsComposition from '../components/EmotionsComposition';
 import EmotionsSummary from '../components/EmotionsSummary';
 import Layout from '../components/Layout';
 import { AuthContext } from '../context/AuthContext';
-import Cookie from 'js-cookie';
-import Notifications from '../components/Notifications';
-import EmotionsComposition from '../components/EmotionsComposition';
 
 const DashboardContainer = styled.div`
   display: flex;
@@ -151,8 +150,6 @@ export default function Dashboard({ emotionsSummary }) {
         </Grid>
 
       </DashboardContainer>
-
-      <Notifications />
 
     </Layout>
   );

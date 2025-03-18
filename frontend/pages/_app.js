@@ -2,6 +2,8 @@ import { createGlobalStyle, ThemeProvider } from 'styled-components';
 import { AuthProvider } from '../context/AuthContext';
 import { EmotionProvider } from '../context/EmotionContext';
 import { ReminderProvider } from '../context/ReminderContext';
+import { useEffect } from 'react';
+import { setReminderNotifications } from '../lib/alertNotifications';
 
 const GlobalStyle = createGlobalStyle`
   @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;500;600;700&display=swap');
@@ -37,6 +39,10 @@ const theme = {
 };
 
 function MyApp({ Component, pageProps }) {
+  useEffect(() => {
+    setReminderNotifications(true);
+  });
+
   return (
     <>
       <GlobalStyle />

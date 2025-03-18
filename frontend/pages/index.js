@@ -3,7 +3,6 @@ import { useRouter } from 'next/router';
 import styled from 'styled-components';
 import Layout from '../components/Layout';
 import { AuthContext } from '../context/AuthContext';
-import Notifications from '../components/Notifications';
 
 const Hero = styled.div`
   text-align: center;
