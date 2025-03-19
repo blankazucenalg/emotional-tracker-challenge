@@ -15,15 +15,16 @@ async function transformReminder(doc) {
     };
     const [hour, minute] = doc.time.split(':');
     const entries = Object.entries(doc.weekDays);
-    const daysOfWeek = entries.reduce((prev, next) => {
+    const daysOfWeek = entries.reduce((prev, next, index) => {
       const [key, value] = next;
       let append = '';
       if (value) {
         append = WEEK_DAYS[key]
+        if (index < (entries.length - 1)) {
+          append += ','
+        }
       }
-      if (WEEK_DAYS[key] !== 0) {
-        append += ','
-      }
+
       return prev + append;
     }, '');
 
