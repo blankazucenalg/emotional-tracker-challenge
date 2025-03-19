@@ -92,7 +92,7 @@ const formatDate = (dateString) => {
 };
 
 const getWeekdays = (weekdaysObj) => {
-  return Object.keys(weekdaysObj);
+  return Object.keys(weekdaysObj).filter(k => weekdaysObj[k]);
 }
 
 const ReminderList = () => {
