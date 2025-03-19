@@ -1,41 +1,30 @@
-const mongoose = require('mongoose');
-const db = mongoose.connection;
-const { Agenda } = require('@hokify/agenda')
-const agenda = new Agenda();
 
-db.collection('jobs').createIndex({
-  nextRunAt: 1,
-  lockedAt: 1,
-  name: 1,
-  priority: 1
-});
+const agenda = require("../agenda.js");
 
-agenda.mongo(db, 'jobs');
-
-async function scheduleTask(name, frequency, data, timezone, callback) {
+async function scheduleReminder(reminderId, frequency, data, timezone) {
   try {
-    await agenda.define(name, { priority: "high", concurrency: 10 }, async (job, done) => {
-      console.log('Job started');
-      await callback(job.attrs.data);
-      done();
-    });
+    agenda.define(`reminder email ${reminderId}`, async (job) => {
+      const data = job.attrs.data;
+      await sendEmail(data.to, data.subject, data.htmlContent);
+    }, { priority: "high", concurrency: 10 });
 
-    await agenda.start();
-    await agenda.every(frequency, name, data, { timezone });
+    await agenda.every(frequency, `reminder email ${reminderId}`, { ...data, _id: reminderId }, { timezone });
+    console.log('job created ', frequency, timezone, data);
   } catch (error) {
-    console.error(`Error scheduling task '${name}': ${error.message}`);
+    console.error(`Error scheduling reminder '${reminderId}': ${error.message}`);
   }
 }
 
-async function cancelTask(name) {
+async function cancelReminder(reminderId) {
   try {
-    await agenda.cancel({ name });
+    console.log('cancel reminder ', reminderId);
+    await agenda.cancel({ name: `reminder email ${reminderId}` });
   } catch (error) {
-    console.error(`Error canceling scheduled task ${name}: ${error.message}`);
+    console.error(`Error canceling scheduled reminder ${reminderId}: ${error.message}`);
   }
 }
 
 module.exports = {
-  scheduleTask,
-  cancelTask
+  scheduleReminder,
+  cancelReminder
 }

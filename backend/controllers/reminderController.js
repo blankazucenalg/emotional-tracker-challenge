@@ -1,9 +1,7 @@
 const { NotFoundError, AuthenticationError } = require('../middlewares/errorHandler');
 const Reminder = require('../models/reminderModel');
-const User = require('../models/userModel');
-const { sendEmail } = require('./emailController');
-const { cancelTask, scheduleTask } = require('./scheduleController');
-const ObjectId = require('mongoose').ObjectId;
+const { cancelReminder, scheduleReminder } = require('./scheduleController');
+const { transformReminder } = require('./transformReminder');
 
 // Get single reminder by ID
 const getReminderById = async (req, res, next) => {
@@ -44,7 +42,8 @@ const createReminder = async (req, res, next) => {
       }
     });
 
-    await setReminderNotifications(newReminder, next);
+    const jobReminder = await transformReminder(newReminder);
+    await scheduleReminder(jobReminder.data._id, jobReminder.frequency, jobReminder.data, jobReminder.timezone);
 
     res.status(201).json(newReminder);
   } catch (error) {
@@ -97,7 +96,7 @@ const deleteReminder = async (req, res, next) => {
     const deleted = await Reminder.findOneAndDelete({ _id: reminderId })
 
     if (deleted) {
-      await cancelTask(reminderId);
+      await cancelReminder(reminderId);
       res.status(200).json(deleted);
 
     } else {
@@ -110,60 +109,10 @@ const deleteReminder = async (req, res, next) => {
   }
 };
 
-async function setReminderNotifications(doc, next) {
-  try {
-    const user = await User.findById(doc.user, { email: 1, timezone: 1 });
-    // Generate cron-like pattern for job scheduler
-    const WEEK_DAYS = {
-      'sunday': 0,
-      'monday': 1,
-      'tuesday': 2,
-      'wednesday': 3,
-      'thursday': 4,
-      'friday': 5,
-      'saturday': 6
-    };
-    const [hour, minute] = doc.time.split(':');
-    const entries = Object.entries(doc.weekDays);
-    const daysOfWeek = entries.reduce((prev, next) => {
-      const [key, value] = next;
-      let append = '';
-      if (value) {
-        append = WEEK_DAYS[key]
-      }
-      if (WEEK_DAYS[key] !== 0) {
-        append += ','
-      }
-      return prev + append;
-    }, '');
-
-    const frequency = `${minute} ${hour} * * ${daysOfWeek}`;
-
-    const mailParams = {
-      to: user.email,
-      subject: `Emotional Tracker - Recordatorio: ${doc.activityName}`,
-      htmlContent: `<h1>Emotional Tracker - Recordatorio</h1>
-        <p>Hola ${user.name}, este es tu recordatorio configurado para "${doc.activityName}" a las ${doc.time} horas.</p>
-        <p>Sigue realizando actividades que contribuyan a tu bienestar mental y físico.</p>
-        <p>Con cariño, el equipo de Emotional Tracker</p>`
-    };
-
-    console.log(doc.id, frequency, mailParams, user.timezone);
-
-    await scheduleTask(doc.id, frequency, mailParams, user.timezone, async (data) => {
-      console.log('sendEmail', data);
-      await sendEmail(data.to, data.subject, data.htmlContent);
-    });
-  } catch (err) {
-    next(err);
-  }
-}
-
 module.exports = {
   getReminderById,
   createReminder,
   updateReminder,
   deleteReminder,
   getReminders,
-  setReminderNotifications
 };
