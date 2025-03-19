@@ -1,5 +1,6 @@
 
 const agenda = require("../agenda.js");
+const { sendEmail } = require("./emailController.js");
 
 async function scheduleReminder(reminderId, frequency, data, timezone) {
   try {
