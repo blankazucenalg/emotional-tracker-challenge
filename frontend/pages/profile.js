@@ -4,6 +4,7 @@ import Link from 'next/link';
 import styled from 'styled-components';
 import Layout from '../components/Layout';
 import { AuthContext } from '../context/AuthContext';
+import moment from 'moment-timezone';
 
 const FormContainer = styled.div`
   max-width: 500px;
@@ -75,7 +76,8 @@ export default function Profile() {
   const [formDataProfile, setFormDataProfile] = useState({
     name: user ? user.name : '',
     email: user ? user.email : '',
-    phone: user ? user.phone : ''
+    phone: user ? user.phone : '',
+    timezone: moment.tz.guess()
   });
   const [formDataPassword, setFormDataPassword] = useState({
     oldPassword: '',
@@ -86,7 +88,8 @@ export default function Profile() {
     setFormDataProfile({
       name: user ? user.name : '',
       email: user ? user.email : '',
-      phone: user ? user.phone : ''
+      phone: user ? user.phone : '',
+      timezone: moment.tz.guess(true)
     });
   }, [user])
 
@@ -116,7 +119,8 @@ export default function Profile() {
         _id: user._id,
         name: formDataProfile.name,
         email: formDataProfile.email,
-        phone: formDataProfile.phone
+        phone: formDataProfile.phone,
+        timezone: moment.tz.guess()
       });
       alert('Profile was updated');
     } catch (error) {

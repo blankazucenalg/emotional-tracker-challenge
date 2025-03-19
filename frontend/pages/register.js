@@ -4,6 +4,7 @@ import Link from 'next/link';
 import styled from 'styled-components';
 import Layout from '../components/Layout';
 import { AuthContext } from '../context/AuthContext';
+import moment from 'moment-timezone';
 
 const FormContainer = styled.div`
   max-width: 500px;
@@ -76,40 +77,41 @@ export default function Register() {
     password: '',
     confirmPassword: ''
   });
-  
+
   const { register } = useContext(AuthContext);
   const router = useRouter();
-  
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
-  
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (formData.password !== formData.confirmPassword) {
       alert('Passwords do not match');
       return;
     }
-    
+
     try {
       await register({
         name: formData.name,
         email: formData.email,
-        password: formData.password
+        password: formData.password,
+        timezone: moment.tz.guess(true),
       });
     } catch (error) {
       console.error('Registration error:', error.response?.data?.message || 'Unknown error');
       alert('Failed to register');
     }
   };
-  
+
   return (
     <Layout title="Registro - Terapia Emocional">
       <FormContainer>
         <Title>Crear una Cuenta</Title>
-        
+
         <Form onSubmit={handleSubmit}>
           <FormGroup>
             <Label htmlFor="name">Nombre</Label>
@@ -122,7 +124,7 @@ export default function Register() {
               onChange={handleChange}
             />
           </FormGroup>
-          
+
           <FormGroup>
             <Label htmlFor="email">Correo Electrónico</Label>
             <Input
@@ -134,7 +136,7 @@ export default function Register() {
               required
             />
           </FormGroup>
-          
+
           <FormGroup>
             <Label htmlFor="password">Contraseña</Label>
             <Input
@@ -146,7 +148,7 @@ export default function Register() {
               required
             />
           </FormGroup>
-          
+
           <FormGroup>
             <Label htmlFor="confirmPassword">Confirmar Contraseña</Label>
             <Input
@@ -158,10 +160,10 @@ export default function Register() {
               required
             />
           </FormGroup>
-          
+
           <Button type="submit">Registrarse</Button>
         </Form>
-        
+
         <LinkText>
           ¿Ya tienes una cuenta? <Link href="/login"><a>Inicia Sesión</a></Link>
         </LinkText>

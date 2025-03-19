@@ -44,9 +44,6 @@ const reminderSchema = new mongoose.Schema({
   }
 });
 
-// reminderSchema.post('save', () => {
-//   // TODO: Generate NotificationEvents for next months based on settings
-// });
-
+reminderSchema.index({ user: 1, activityName: 1, time: 1 }, { unique: true });
 
 module.exports = mongoose.model('Reminder', reminderSchema);

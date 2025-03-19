@@ -13,7 +13,7 @@ const generateToken = (id) => {
 
 const updateUserProfile = async (req, res, next) => {
   const authUser = req.user._id;
-  const { _id, name, email, phone } = req.body;
+  const { _id, name, email, phone, timezone } = req.body;
 
   try {
     if (authUser.toString() !== _id) {
@@ -32,10 +32,10 @@ const updateUserProfile = async (req, res, next) => {
       user.email = email;
     }
 
-    if (name)
-      user.name = name;
-    if (phone)
-      user.phone = phone;
+    user.name = name || user.name;
+    user.phone = phone || user.phone;
+    user.timezone = timezone || user.timezone;
+
     await user.save();
 
     res.status(200).json({
@@ -120,6 +120,7 @@ const getUserProfile = async (req, res, next) => {
       name: user.name,
       email: user.email,
       phone: user.phone,
+      timezone: user.timezone,
     });
   } catch (err) {
     next(err);
@@ -127,7 +128,7 @@ const getUserProfile = async (req, res, next) => {
 };
 
 const registerUser = async (req, res, next) => {
-  const { name, email, password } = req.body;
+  const { name, email, password, timezone } = req.body;
 
   try {
     // Check if user already exists
@@ -141,7 +142,8 @@ const registerUser = async (req, res, next) => {
     const user = await User.create({
       name,
       email,
-      password
+      password,
+      timezone
     });
 
     if (user) {

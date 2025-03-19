@@ -10,10 +10,12 @@
     "seed": "node seeders/seed.js"
   },
   "dependencies": {
+    "@hokify/agenda": "^6.3.0",
     "bcryptjs": "^2.4.3",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "date-fns": "^4.1.0",
+    "dot-env": "^0.0.1",
     "dotenv": "^10.0.0",
     "express": "^4.17.1",
     "express-session": "^1.18.1",
@@ -21,7 +23,6 @@
     "helmet": "^8.0.0",
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^6.0.12",
-    "node-cron": "^3.0.3",
     "nodemailer": "^6.10.0",
     "validator": "^13.12.0"
   },

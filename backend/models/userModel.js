@@ -31,6 +31,9 @@ const userSchema = new mongoose.Schema({
     validate: [validator.isMobilePhone, 'Please fill a valid phone number']
   },
   therapistId: String,
+  timezone: {
+    type: String,
+  },
   createdAt: {
     type: Date,
     default: Date.now
