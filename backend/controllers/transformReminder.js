@@ -14,19 +14,17 @@ async function transformReminder(doc) {
       'saturday': 6
     };
     const [hour, minute] = doc.time.split(':');
-    const entries = Object.entries(doc.weekDays);
-    const daysOfWeek = entries.reduce((prev, next, index) => {
-      const [key, value] = next;
-      let append = '';
-      if (value) {
-        append = WEEK_DAYS[key]
-        if (index < (entries.length - 1)) {
+    const selectedDays = Object.keys(doc.weekDays).filter(k => doc.weekDays[k]);
+    const daysOfWeek = selectedDays
+      .reduce((prev, next, index) => {
+        let append = '';
+        append = WEEK_DAYS[next]
+        if (index < (selectedDays.length - 1)) {
           append += ','
         }
-      }
 
-      return prev + append;
-    }, '');
+        return prev + append;
+      }, '');
 
     const frequency = `${minute} ${hour} * * ${daysOfWeek}`;
 
