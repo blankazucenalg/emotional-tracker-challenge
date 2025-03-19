@@ -21,10 +21,6 @@ router.route('/:id')
 
 router.get('/analytics/summary', protect, getEmotionsSummary);
 
-router.route('/analytics/summary')
-  .get(protect, getEmotionsSummary);
-
-// TODO: Add route for getting emotion summary
 // TODO: Add route for sharing data with therapists
 
 module.exports = router;

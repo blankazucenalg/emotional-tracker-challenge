@@ -59,7 +59,10 @@ The application includes a system to generate test data, making it easier to tes
        - MONGO_URI=mongodb://mongodb:27017/emotionaltracker
        - JWT_SECRET=mysecretkey123
        - SEED_DATABASE=true  # Change to true to generate test data
+       - EMAIL_ADDRESS
+       - EMAIL_PASSWORD
    ```
+   You can use a `.env` file to pass secrets like `EMAIL_ADDRESS` and `EMAIL_PASSWORD`
    - Restart containers: `docker compose down && docker compose up`
 
 ## Technical Test Tasks
@@ -86,6 +89,8 @@ As a candidate, you are expected to implement the following features:
 - POST `/api/users/register` - Register a new user
 - POST `/api/users/login` - Login a user
 - GET `/api/users/profile` - Get user profile (protected)
+- PUT `/api/users/profile` - Update user's profile (protected)
+- PUT `/api/users/updatePassword` - Update user's password (protected)
 
 ### Emotions
 
@@ -93,6 +98,13 @@ As a candidate, you are expected to implement the following features:
 - GET `/api/emotions/:id` - Get a specific emotion
 - POST `/api/emotions` - Create a new emotion entry (protected)
 - PUT `/api/emotions/:id` - Update an emotion (protected)
+- GET `/api/emotions/analytics/summary` - Get emotions summary (for dashboard analytics)
+
+### Reminders
+
+- GET `/api/reminders` - Get all reminders for a user (protected)
+- POST `/api/reminders` - Create a new reminder entry (protected)
+- DELETE `/api/reminders/:id` - Delete a reminder (protected)
 
 ## Technologies Used
 
