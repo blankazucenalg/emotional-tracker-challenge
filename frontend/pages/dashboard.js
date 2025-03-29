@@ -166,15 +166,15 @@ export default function Dashboard() {
   async function handleSubmit(e) {
     e.preventDefault();
 
-    getData();
+    await getData();
   }
 
   // Basic auth protection
-  useEffect(() => {
+  useEffect(async () => {
     if (!loading && !user) {
       router.push('/login');
     }
-    getData();
+    await getData();
   }, [loading, user, router]);
 
   if (loading || !user) {
