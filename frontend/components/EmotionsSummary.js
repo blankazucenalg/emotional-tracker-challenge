@@ -1,6 +1,4 @@
-import { useContext, useEffect } from 'react';
 import styled from 'styled-components';
-import { EmotionContext } from '../context/EmotionContext';
 
 const HistoryContainer = styled.div`
   background-color: white;
@@ -59,13 +57,7 @@ const formatDate = (dateString) => {
   return date.toLocaleString();
 };
 
-const EmotionsSummary = () => {
-  const { emotionsSummary, loading, getEmotionsSummary } = useContext(EmotionContext);
-
-  // Fetch emotions on component mount
-  useEffect(() => {
-    getEmotionsSummary();
-  }, []);
+const EmotionsSummary = ({ data }) => {
 
   const translateEmotion = (emotion) => {
     const translations = {
@@ -80,13 +72,11 @@ const EmotionsSummary = () => {
 
   return (
     <HistoryContainer>
-      {loading ? (
-        <p>Cargando...</p>
-      ) : emotionsSummary.length === 0 ? (
+      {data.length === 0 ? (
         <EmptyState>No hay emociones registradas aún. ¡Comienza a hacer seguimiento de tus emociones arriba!</EmptyState>
       ) : (
         <EmotionList>
-          {emotionsSummary.map((emotion) => (
+          {data.map((emotion) => (
             <EmotionCard key={emotion.id || emotion._id}>
               <EmotionName className={emotion.emotion}>
                 {translateEmotion(emotion.emotion)}

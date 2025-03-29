@@ -4,7 +4,8 @@ const {
   getEmotionById,
   createEmotion,
   updateEmotion,
-  getEmotionsSummary
+  getEmotionsSummary,
+  getEmotionsHighlights
 } = require('../controllers/emotionController');
 const { protect } = require('../middlewares/authMiddleware');
 
@@ -20,6 +21,8 @@ router.route('/:id')
   .put(protect, updateEmotion);
 
 router.get('/analytics/summary', protect, getEmotionsSummary);
+
+router.get('/analytics/highlights', protect, getEmotionsHighlights);
 
 // TODO: Add route for sharing data with therapists
 

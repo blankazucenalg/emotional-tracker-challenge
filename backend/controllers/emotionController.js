@@ -1,5 +1,6 @@
-const { NotFoundError, AuthenticationError } = require('../middlewares/errorHandler');
+const { NotFoundError, AuthenticationError, BadRequestError } = require('../middlewares/errorHandler');
 const Emotion = require('../models/emotionModel');
+const validator = require('validator');
 
 // Get single emotion by ID
 const getEmotionById = async (req, res, next) => {
@@ -68,7 +69,7 @@ const getEmotions = async (req, res, next) => {
   }
   const matchParams = { user: req.user._id };
   try {
-    const emotions = await Emotion.find(matchParams);
+    const emotions = await Emotion.find(matchParams).sort({ date: -1 });
     res.status(200).json(emotions);
   } catch (error) {
     next(error);
@@ -81,11 +82,33 @@ const getEmotionsSummary = async (req, res, next) => {
     if (!userId) {
       throw new AuthenticationError('User needs to be authenticated');
     }
+    if (req.query.dateStart && !validator.isDate(req.query.dateStart)) {
+      throw new BadRequestError('dateStart is not a valid date');
+    }
+    if (req.query.dateEnd && !validator.isDate(req.query.dateEnd)) {
+      throw new BadRequestError('dateEnd is not a valid date');
+    }
+
+    const matchParams = {
+      user: userId,
+    }
+    if (req.query.dateStart && req.query.dateEnd) {
+      const dateStart = new Date(req.query.dateStart);
+      const dateEnd = new Date(req.query.dateEnd);
+
+      if (dateEnd < dateStart) {
+        throw new BadRequestError('dateStart must be before than dateEnd');
+      }
+      matchParams['$expr'] = {
+        $and: [
+          { $gte: ['$date', dateStart] },
+          { $lte: ['$date', dateEnd] }
+        ]
+      }
+    }
     const emotions = await Emotion.aggregate([
       {
-        $match: {
-          user: userId
-        }
+        $match: matchParams
       },
       { $sort: { date: 1 } },
       {
@@ -105,10 +128,73 @@ const getEmotionsSummary = async (req, res, next) => {
   }
 };
 
+const getEmotionsHighlights = async (req, res, next) => {
+  const userId = req.user._id;
+  try {
+    if (req.query.dateStart && !validator.isDate(req.query.dateStart)) {
+      throw new BadRequestError('dateStart is not a valid date');
+    }
+    if (req.query.dateEnd && !validator.isDate(req.query.dateEnd)) {
+      throw new BadRequestError('dateEnd is not a valid date');
+    }
+
+    const matchParams = {
+      user: userId,
+    };
+    if (req.query.dateStart && req.query.dateEnd) {
+      const dateStart = new Date(req.query.dateStart);
+      const dateEnd = new Date(req.query.dateEnd);
+      if (dateEnd < dateStart) {
+        throw new BadRequestError('dateStart must be before than dateEnd');
+      }
+      matchParams['$expr'] = {
+        $and: [
+          { $gte: ['$date', dateStart] },
+          { $lte: ['$date', dateEnd] }
+        ]
+      };
+    }
+
+    const emotions = await Emotion.aggregate([
+      {
+        $match: matchParams
+      },
+      {
+        $group: {
+          _id: '$emotion',
+          emotion: { $first: '$emotion' },
+          averageIntensity: { $avg: '$intensity' },
+          count: { $sum: 1 }
+        }
+      },
+      {
+        $group: {
+          _id: null,
+          total: { $sum: '$count' },
+          emotions: { $push: '$$ROOT' }
+        }
+      },
+      { $unwind: { path: '$emotions' } },
+      { $replaceRoot: { newRoot: { $mergeObjects: [{ percentage: { $multiply: [{ $divide: ['$emotions.count', '$total'] }, 100] } }, '$emotions'] } } },
+      {
+        $sort: {
+          count: -1,
+          averageIntensity: -1
+        }
+      }
+    ]);
+
+    res.json(emotions);
+  } catch (error) {
+    next(error);
+  }
+}
+
 module.exports = {
   getEmotionById,
   createEmotion,
   updateEmotion,
   getEmotions,
-  getEmotionsSummary
+  getEmotionsSummary,
+  getEmotionsHighlights
 };

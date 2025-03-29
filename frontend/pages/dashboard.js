@@ -1,8 +1,10 @@
 import Cookie from 'js-cookie';
+import moment from 'moment-timezone';
 import { useRouter } from 'next/router';
-import { useContext, useEffect } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import EmotionsComposition from '../components/EmotionsComposition';
+import EmotionsHighlight from '../components/EmotionsHighlight';
 import EmotionsSummary from '../components/EmotionsSummary';
 import Layout from '../components/Layout';
 import { AuthContext } from '../context/AuthContext';
@@ -67,32 +69,112 @@ const CardLink = styled.a`
   }
 `;
 
-export async function getServerSideProps() {
-  const token = Cookie.get('token');
-  if (!token) {
-    return { props: { emotionsSummary: [] } };
-  }
-  const res = await fetch('http://localhost:5050/api/emotions/analytics/summary', {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`
-    }
-  });
-  const emotionsSummary = await res.json();
-  // Pass data to the page via props
-  return { props: { emotionsSummary } }
-}
+const FilterSet = styled.div`
+  display: flex;
+  flex-direction: row;
+  gap: 0.7rem;
+`;
 
-export default function Dashboard({ emotionsSummary }) {
+export default function Dashboard() {
+  const MIN_DATE = '2025-01-01';
+  const MAX_DATE = moment().format('YYYY-MM-DD');
+
   const { user, loading } = useContext(AuthContext);
   const router = useRouter();
+
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [form, setForm] = useState({
+    dateStart: moment().subtract(1, 'months').format('YYYY-MM-DD'),
+    dateEnd: moment().format('YYYY-MM-DD'),
+  });
+  const [emotionsSummary, setEmotionsSummary] = useState([]);
+  const [emotionsComposition, setEmotionsComposition] = useState([]);
+  const [emotionsHighlight, setEmotionsHighlight] = useState({});
+
+  async function getEmotionsComposition(token, form) {
+    const response = await fetch(`http://localhost:5050/api/emotions/analytics/highlights?dateStart=${form.dateStart}&dateEnd=${form.dateEnd}`, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+
+    if (!response.ok) {
+      throw new Error('Failed to submit the data. Please try again.')
+    }
+
+    const data = await response.json();
+    return data;
+  }
+
+  async function getEmotionsSummary(token, form) {
+    const response = await fetch(`http://localhost:5050/api/emotions/analytics/summary?dateStart=${form.dateStart}&dateEnd=${form.dateEnd}`, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+
+    if (!response.ok) {
+      throw new Error('Failed to submit the data. Please try again.')
+    }
+
+    const data = await response.json();
+    console.log(data);
+    return data;
+  }
+
+  async function getData() {
+    setIsLoading(true);
+    setError(null);
+    try {
+
+      const token = Cookie.get('token');
+
+      if (!token) {
+        setEmotionsHighlight([]);
+        setEmotionsSummary([]);
+        setEmotionsComposition([]);
+        setIsLoading(false);
+        return;
+      }
+
+      console.log(form);
+
+      const emotionsSummaryRes = await getEmotionsSummary(token, form);
+      emotionsSummaryRes.sort((a, b) => a.lastDate > b.lastDate ? -1 : 1);
+      setEmotionsSummary(emotionsSummaryRes);
+
+      const emotionCompositionRes = await getEmotionsComposition(token, form);
+      setEmotionsComposition(emotionCompositionRes);
+
+      const emotionsHighlightRes = emotionCompositionRes[0];
+      setEmotionsHighlight(emotionsHighlightRes);
+
+    } catch (error) {
+      setError(error.message);
+    } finally {
+      setIsLoading(false);
+    }
+  }
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setForm({ ...form, [name]: value });
+  };
+
+  async function handleSubmit(e) {
+    e.preventDefault();
+
+    getData();
+  }
 
   // Basic auth protection
   useEffect(() => {
     if (!loading && !user) {
       router.push('/login');
     }
+    getData();
   }, [loading, user, router]);
 
   if (loading || !user) {
@@ -110,9 +192,26 @@ export default function Dashboard({ emotionsSummary }) {
           <Title>¡Bienvenido, {user.name}!</Title>
           <Subtitle>Aquí tienes un resumen de tu bienestar emocional</Subtitle>
 
-          {/* TODO: Add charts and statistics */}
-          <EmotionsSummary />
-          <EmotionsComposition />
+          <FilterSet>
+            <form onSubmit={handleSubmit}>
+              <input type='date' id="dateStart" name="dateStart" min={MIN_DATE} value={form.dateStart} onChange={handleChange} max={form.dateEnd} />
+              <input type='date' id="dateEnd" name="dateEnd" max={MAX_DATE} value={form.dateEnd} onChange={handleChange} min={form.dateStart} />
+              <input type='submit' value="Seleccionar fechas" />
+            </form>
+          </FilterSet>
+          <div>
+
+            {loading || isLoading ? (<p>Cargando... </p>
+            ) : error ? (
+              <p>{error.message}</p>
+            ) : (
+              <>
+                <EmotionsSummary data={emotionsSummary} />
+                <EmotionsComposition data={emotionsComposition} />
+                <EmotionsHighlight data={emotionsHighlight} />
+              </>
+            )}
+          </div>
         </WelcomeCard>
 
 

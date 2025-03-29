@@ -8,8 +8,6 @@ const API_URL = 'http://localhost:5050/api';
 export const EmotionContext = createContext();
 
 export const EmotionProvider = ({ children }) => {
-  const [emotionsSummary, setEmotionsSummary] = useState([]);
-  const [emotionsComposition, setEmotionsComposition] = useState([]);
   const [emotions, setEmotions] = useState([]);
   const [loading, setLoading] = useState(false);
 
@@ -70,61 +68,6 @@ export const EmotionProvider = ({ children }) => {
     }
   };
 
-  const getEmotionsSummary = async () => {
-    try {
-      setLoading(true);
-      const token = Cookie.get('token');
-
-      if (!token) {
-        setEmotionsSummary([]);
-        setLoading(false);
-        return;
-      }
-
-      const res = await axios.get(`${API_URL}/emotions/analytics/summary`, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
-
-      const summary = res.data;
-      summary.sort((a, b) => a.lastDate > b.lastDate ? -1 : 1);
-      setEmotionsSummary(summary);
-    } catch (error) {
-      console.error('Error fetching emotions summary');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const getEmotionsComposition = async () => {
-    try {
-      setLoading(true);
-      const token = Cookie.get('token');
-
-      if (!token) {
-        setEmotionsComposition([]);
-        setLoading(false);
-        return;
-      }
-
-      const res = await axios.get(`${API_URL}/emotions/analytics/summary`, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
-
-      const total = res.data.reduce((prev, next) => prev + next.count, 0);
-      const emotionsComposition = res.data.map(emotion => ({ ...emotion, percentage: emotion.count / total * 100 }));
-      emotionsComposition.sort((a, b) => a.percentage > b.percentage ? -1 : 1);
-      setEmotionsComposition(emotionsComposition);
-    } catch (error) {
-      console.error('Error fetching emotions summary');
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const shareWithTherapist = async (emotionIds) => {
     // TODO: Implement sharing with therapist
     console.log('Sharing emotions with therapist:', emotionIds);
@@ -137,11 +80,7 @@ export const EmotionProvider = ({ children }) => {
         loading,
         getEmotions,
         addEmotion,
-        emotionsSummary,
-        getEmotionsSummary,
-        emotionsComposition,
-        getEmotionsComposition,
-        shareWithTherapist
+        shareWithTherapist,
       }}
     >
       {children}

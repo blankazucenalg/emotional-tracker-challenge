@@ -1,6 +1,4 @@
-import { useContext, useEffect } from 'react';
 import styled from 'styled-components';
-import { EmotionContext } from '../context/EmotionContext';
 
 const HistoryContainer = styled.div`
   background-color: white;
@@ -42,32 +40,12 @@ const EmotionPart = styled.div`
   flex-direction: column;
 `;
 
-const EmotionDatum = styled.div`
-  margin: 0.1rem 0;
-  
-  span {
-    font-size: 0.9rem;
-    color: #7f8c8d;
-  }
-`;
-
 const EmotionPercentage = styled.span`
   color:rgb(36, 37, 37);
   font-size: 0.8rem;
 `;
 
-const formatDate = (dateString) => {
-  const date = new Date(dateString);
-  return date.toLocaleString();
-};
-
-const EmotionsComposition = () => {
-  const { emotionsComposition, loading, getEmotionsComposition } = useContext(EmotionContext);
-
-  // Fetch emotions on component mount
-  useEffect(() => {
-    getEmotionsComposition();
-  }, []);
+const EmotionsComposition = ({ data }) => {
 
   const translateEmotion = (emotion) => {
     const translations = {
@@ -82,13 +60,11 @@ const EmotionsComposition = () => {
 
   return (
     <HistoryContainer>
-      {loading ? (
-        <p>Cargando...</p>
-      ) : emotionsComposition.length === 0 ? (
+      {data.length === 0 ? (
         <EmptyState>No hay emociones registradas aún. ¡Comienza a hacer seguimiento de tus emociones arriba!</EmptyState>
       ) : (
         <EmotionList>
-          {emotionsComposition.map((emotion) => (
+          {data.map((emotion) => (
             <EmotionCard key={emotion.id || emotion._id} className={emotion.emotion} style={{ width: `${emotion.percentage}%` }}>
               <EmotionPart>
                 <span>{translateEmotion(emotion.emotion)}</span>
